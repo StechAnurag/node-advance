@@ -1,3 +1,4 @@
+process.env.UV_THREADPOOL_SIZE = 1;
 const cluster = require('cluster');
 
 // console.log(cluster.isMaster);
@@ -9,6 +10,8 @@ if (cluster.isMaster) {
   //   cluster.fork();
   //   cluster.fork();
   //   cluster.fork();
+
+  // [RULE] no of children <= no. of physical or logical cores of the CPU
 } else {
   // I m a child, I am going to act like a server and do nothing else
   const express = require('express');
@@ -30,7 +33,10 @@ if (cluster.isMaster) {
 
   app.get('/', (req, res) => {
     // doWork(5000);
-    res.send('Hi there!');
+    crypto.pbkdf2('password', 'salt', 100000, 512, 'sha512', (err, data) => {
+      res.send('Hi there!');
+    });
+    // res.send('Hi there!');
   });
 
   app.get('/fast', (req, res) => {
