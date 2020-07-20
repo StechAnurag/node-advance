@@ -1,47 +1,40 @@
-process.env.UV_THREADPOOL_SIZE = 1;
-const cluster = require('cluster');
+const express = require('express');
+const crypto = require('crypto');
+const app = express();
+const Worker = require('webworker-threads').Worker;
 
-// console.log(cluster.isMaster);
-
-// Is the file being executed in master mode?
-if (cluster.isMaster) {
-  // Cause index.js to be executed *again* but in child mode
-  cluster.fork();
-  //   cluster.fork();
-  //   cluster.fork();
-  //   cluster.fork();
-
-  // [RULE] no of children <= no. of physical or logical cores of the CPU
-} else {
-  // I m a child, I am going to act like a server and do nothing else
-  const express = require('express');
-  const app = express();
+app.get('/', (req, res) => {
+  const a = 1;
 
   /**
-   * Blocking the event loop
-   *
+   * IMPORTANT NOTE -
+   * The worker instance doesnot have variable a = 1 access inside it.
+   * Webworkers totally work beyond the closer scope of outer / parent function
    */
 
-  // This code gets executed inside the event loop, not in thread pool nor offloaded to OS
-  /**
-   *  [Refactoring after lecture 27]
-   */
-  // function doWork(duration) {
-  //   const start = Date.now();
-  //   while (Date.now() - start < duration) {}
-  // }
+  // The Worker Interface
+  const worker = new Worker(function () {
+    this.onmessage = function () {
+      let counter = 0;
+      while (counter < 1e9) {
+        counter++;
+      }
 
-  app.get('/', (req, res) => {
-    // doWork(5000);
-    crypto.pbkdf2('password', 'salt', 100000, 512, 'sha512', (err, data) => {
-      res.send('Hi there!');
-    });
-    // res.send('Hi there!');
+      postMessage(counter);
+    };
   });
 
-  app.get('/fast', (req, res) => {
-    res.send('This route was fast!');
-  });
+  // Message From worker into Our App
+  worker.onmessage = function (myCounter) {
+    console.log(myCounter);
+  };
 
-  app.listen(3000);
-}
+  // Message From Our app to the Worker instance
+  worker.postMessage = function () {};
+});
+
+app.get('/fast', (req, res) => {
+  res.send('This route was fast!');
+});
+
+app.listen(3000);
