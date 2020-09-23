@@ -3,7 +3,8 @@ const puppeteer = require('puppeteer');
 let browser, page;
 beforeEach(async () => {
   browser = await puppeteer.launch({
-    headless: false
+    headless: true,
+    args: ['--no-sandbox']
   });
   // const context = await browser.createIncognitoBrowserContext();
   // page = await context.newPage();
@@ -54,5 +55,5 @@ test.only('when signed in, shows a logout button', async () => {
 
   await page.setCookie({ name: 'session', value: sessionString });
   await page.setCookie({ name: 'session.sig', value: sig });
-  await page.goto('localhost:3000');
+  await page.goto('http://localhost:3000');
 });
