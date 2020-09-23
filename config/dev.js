@@ -4,5 +4,7 @@ module.exports = {
   mongoURI:
     'mongodb+srv://superUserSimba:super_SecretPASSword@cluster0.he5ag.mongodb.net/blogster?retryWrites=true&w=majority',
   cookieKey: '123123123',
-  redisUrl: 'redis://127.0.0.1:6379'
+  redisUrl: 'redis://127.0.0.1:6379',
+  accessKeyId: 'AKIAWULQCTI2QTVBRL4W',
+  secretAccessKey: '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'
 };
